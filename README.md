@@ -1,6 +1,5 @@
 # web_pattern
 
-first modification
-second modification
-third modification
+Summarize information about telomeric pattern search in certain taxonomic groups into a web page
+
 
