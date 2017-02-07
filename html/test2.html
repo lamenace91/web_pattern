@@ -1,0 +1,41 @@
+<html>
+  <head>
+    <title>Bootstrap Tree View</title>
+    <link href="./bootstrap.css" rel="stylesheet">
+    <!-- <link href="./bootstrap-treeview-1.2.0/public/css/bootstrap-treeview.css" rel="stylesheet"> -->
+    <script src="./jquery-3.1.1.min.js"></script>
+  	<script src="./bootstrap-treeview-1.2.0/public/js/bootstrap-treeview.js"></script>
+	<link rel="import" href="">
+
+  </head>
+  <body>
+   	<div class="container">
+      <div class="col-sm-4">
+          <h2>Collapsed</h2>
+          <div id="treeview6" class=""></div>
+        </div>	 
+    <script src="tree_data.html"></script>
+        
+  	<script type="text/javascript">
+  		$(function() {
+  
+        $('#treeview2').treeview({
+          levels: 1,
+          data: tree
+        });
+       $('#treeview6').treeview({
+          color: "#428bca",
+          expandIcon: "glyphicon glyphicon-stop",
+          collapseIcon: "glyphicon glyphicon-unchecked",
+          nodeIcon: "glyphicon glyphicon-user",
+          showTags: true,
+          data: tree
+        });
+        });
+     
+  	</script>
+  </div>	  
+  </body>
+</html>	  
+	  
+	  
