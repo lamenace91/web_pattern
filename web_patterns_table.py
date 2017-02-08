@@ -5,8 +5,10 @@ from ete3 import NCBITaxa
 from optparse import OptionParser
 import pandas
 import os
+import shutil
 import matplotlib.pyplot as plt
 import numpy as np
+import glob
 from flask import Flask
 from flask import render_template
 from flask import send_from_directory
@@ -15,7 +17,7 @@ from flask import flash
 from flask import redirect
 from flask import url_for
 import jinja2
-
+import re
 
 ###################################################
 # Initialization of the Flask application
@@ -25,20 +27,51 @@ app.config.from_object(__name__)
 ## variables
 myport = 5555
 version = 0.1
-dataset = "./patterns.dat4"
+dataset = "./patterns.dat.tmp"   # replaced by datadir
+datadir = "../"                  # directory with .ok and .error files
+species_id_file = "species_id.dat"
 png_directory = "png/"
 ranks=['order', 'genus', 'species']
 
 ###################################################
 ## Initialization steps
 
-if not os.path.exists(dataset):
-    print("Error: input file %s doesn't exist !!" % (dataset))
-    exit()
+#if not os.path.exists(dataset):
+    #print("Error: input file %s doesn't exist !!" % (dataset))
+    #exit()
 
 if not os.path.exists(png_directory):
     os.makedirs(png_directory)
 
+
+
+
+###################################################
+def merge_ok_error_files(data_dir, outfilename):
+		
+	pat = re.compile('.*/')
+	pat2 = re.compile('\.[^ ]* ')
+	pat3 = re.compile('  ')
+	outfile = open(outfilename, 'w')
+	outfile.write("ID - nbseqE nbseqO - nbrep maxrep - TAGGG nbTAGGG TTAGG nbTTAGG TTAGGG nbTTAGGG TTTAGGG nbTTTAGGG TTTTAGGG nbTTTTAGGG TTGGGG nbTTGGGG TTTGGG nbTTTGGG TTTTGGGG nbTTTTGGGG AATGGGGGG nbAATGGGGGG TCAGG nbTCAGG TTAGGC nbTTAGGC TTGCA nbTTGCA TGTGGG nbTGTGGG TTGTGG nbTTGTGG\n")
+	for filename in glob.glob(data_dir+"/"+'*.ok'):
+		with open(filename, "rt") as fin:
+			for line in fin:
+				line = re.sub(pat, '', line)
+				line = re.sub(pat2, ' ', line)
+				outfile.write(re.sub(pat3, ' 0 ', line))
+
+	outfile.close()
+	outfile = open(outfilename, 'a')
+	for filename in glob.glob(data_dir+"/"+'*.error'):
+		with open(filename, "rt") as fin:
+			for line in fin:
+				line = re.sub(pat,  '', line)
+				line = re.sub(pat2, ' ', line)
+			
+				outfile.write(re.sub(pat3, ' 0 ', line))
+	outfile.close()
+	
 ###################################################
 def add_taxonomy(data, ranks):
 	tmpranks = {}
@@ -46,7 +79,8 @@ def add_taxonomy(data, ranks):
 		tmpranks[ranks[ii]] = []
 	for ii, row in data.iterrows():
 		print("#############################")
-		tax = get_taxonomy(row['mySpecies'], name_format="Genus_species", ranks=ranks)
+		tax = get_taxonomy(row['ScientificName'], name_format="Genus_species", ranks=ranks)
+		print(tax)
 		for jj in range(len(ranks)):
 			tmpranks[ranks[jj]].append(tax[jj])	
 	for ii in range(len(ranks)):
@@ -161,8 +195,15 @@ def build_barplot(row):
 
 @app.route('/')
 def process():	
-	data=pandas.read_table(dataset, sep=" ")
-	data = add_taxonomy(data, ranks)
+	merge_ok_error_files(datadir,	dataset)
+	data_ok_error=pandas.read_table(dataset, sep=" ").set_index('ID')
+	species_id=pandas.read_table(species_id_file, sep=" ").drop_duplicates().set_index('Run')
+	data2 = data_ok_error.join(species_id, lsuffix='_l', rsuffix='_r')
+	
+	print(data_ok_error)
+	print(species_id[1:5][:])
+	#print(data2)
+	species_id_tax = add_taxonomy(species_id, ranks)
 	print(data[1:5][:])
 	return render_template('output.html', version=version, data=data.to_html())
  
