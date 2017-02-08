@@ -28,6 +28,7 @@ app.config.from_object(__name__)
 myport = 5555
 version = 0.1
 dataset = "./patterns.dat.tmp"   # replaced by datadir
+dataset = "patterns.dat4"
 datadir = "../"                  # directory with .ok and .error files
 species_id_file = "species_id.dat"
 png_directory = "png/"
@@ -78,14 +79,11 @@ def add_taxonomy(data, ranks):
 	for ii in range(0, len(ranks)):
 		tmpranks[ranks[ii]] = []
 	for ii, row in data.iterrows():
-		print("#############################")
 		tax = get_taxonomy(row['ScientificName'], name_format="Genus_species", ranks=ranks)
-		print(tax)
 		for jj in range(len(ranks)):
 			tmpranks[ranks[jj]].append(tax[jj])	
 	for ii in range(len(ranks)):
 		data[ranks[ii]] = tmpranks[ranks[ii]]
-	data = data.sort(ranks)
 	return(data)
 
 
@@ -111,9 +109,14 @@ def get_taxonomy(species_name, name_format="Genus species", ranks=None, update_d
 	lineage_rk = ncbi.get_rank(lineage_ids)
 	parsed_names=[]
 	for rk in ranks:
+		fd = 0
 		for rk_id,rk_rk in lineage_rk.items():
 			if rk_rk == rk:
+				fd = 1
 				parsed_names.append(ncbi.get_taxid_translator([rk_id])[rk_id])	
+		if fd == 0:
+			parsed_names.append('unknown')	
+			
 	return(parsed_names)
 ###################################################
 def build_tree(tree, outfile="html/tree_data.html"):
@@ -189,23 +192,42 @@ def build_barplot(row):
 	plt.savefig(options.png_directory + "/" + str(row['mySpecies']) + "_" + str(row['ID']) + '.png')
 	plt.clf()
 	plt.close()
+###################################################
+def add_lines(data,ranks):
+	data2 = data
+	data = data.sort(ranks)
+	for ii in range(len(ranks)):
+		pred = ""
+		rk = ranks[ii]
+		for jj, row in data.iterrows():
+			if row[rk] != pred:
+				data2 = data2.append(1)
+			data2 = data2.append(row)
+	return(data)
 	
 ###################################################
 ## the main route
 
 @app.route('/')
 def process():	
-	merge_ok_error_files(datadir,	dataset)
+	#merge_ok_error_files(datadir,	dataset)
 	data_ok_error=pandas.read_table(dataset, sep=" ").set_index('ID')
 	species_id=pandas.read_table(species_id_file, sep=" ").drop_duplicates().set_index('Run')
-	data2 = data_ok_error.join(species_id, lsuffix='_l', rsuffix='_r')
-	
-	print(data_ok_error)
-	print(species_id[1:5][:])
-	#print(data2)
 	species_id_tax = add_taxonomy(species_id, ranks)
-	print(data[1:5][:])
-	return render_template('output.html', version=version, data=data.to_html())
+	data2 = data_ok_error.join(species_id_tax, lsuffix='_l', rsuffix='_r')
+	data2 = add_lines(data2, ranks)
+	data2.reset_index(level=['ID'], inplace = True)
+
+	col = []
+	for ii in range(len(ranks)):
+		col.append(ranks[ii])
+	col.append('ID')
+	print(data2[1:5][:])
+	data2 = data2[col] 
+
+
+
+	return render_template('output.html', version=version, data=data2.to_html())
  
 ###################################################
 ###################################################
