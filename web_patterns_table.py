@@ -194,15 +194,45 @@ def build_barplot(row):
 	plt.close()
 ###################################################
 def add_lines(data,ranks):
-	data2 = data
-	data = data.sort(ranks)
-	for ii in range(len(ranks)):
-		pred = ""
-		rk = ranks[ii]
-		for jj, row in data.iterrows():
-			if row[rk] != pred:
-				data2 = data2.append(1)
-			data2 = data2.append(row)
+	# get lines with ranks
+	subdata = data[ranks[0:1]]
+	for ii in range(1,len(ranks)):
+		subdata = subdata.append(data[ranks[0:ii+1]])
+	subdata=subdata.drop_duplicates()
+
+	# add columns with numbers to ranks
+	p = re.compile('nb.*')
+	col = data.columns.values.tolist()
+	selected_col =[]
+	for cc in col:
+		if p.match(cc):
+			selected_col.append(cc)
+	for cc in selected_col:
+		subdata[cc]=0
+
+	# filling columns of numbers
+	
+	for yy,rowsub in subdata.iterrows():
+		for xx,row in data.iterrows():
+			fit = 1
+			for ii in range(len(ranks)):
+				if rowsub[ranks[ii]] != "NA" and rowsub[ranks[ii]] != row[ranks[ii]]:
+					 fit = 0
+			if fit == 1:
+				for cc in selected_col:
+					rowsub[cc] = rowsub[cc] + row[cc]
+	print(subdata)
+	exit()
+	data = data.append(subdata.drop_duplicates())
+	ranks.append('ID')
+#	print(ranks)
+
+	
+	data = data.sort_values(ranks, na_position='first')	
+	data = data.fillna('')
+	
+	
+	
 	return(data)
 	
 ###################################################
@@ -210,23 +240,19 @@ def add_lines(data,ranks):
 
 @app.route('/')
 def process():	
-	#merge_ok_error_files(datadir,	dataset)
-	data_ok_error=pandas.read_table(dataset, sep=" ").set_index('ID')
-	species_id=pandas.read_table(species_id_file, sep=" ").drop_duplicates().set_index('Run')
-	species_id_tax = add_taxonomy(species_id, ranks)
-	data2 = data_ok_error.join(species_id_tax, lsuffix='_l', rsuffix='_r')
-	data2 = add_lines(data2, ranks)
-	data2.reset_index(level=['ID'], inplace = True)
-
 	col = []
 	for ii in range(len(ranks)):
 		col.append(ranks[ii])
 	col.append('ID')
-	print(data2[1:5][:])
+	merge_ok_error_files(datadir,	dataset)
+	data_ok_error=pandas.read_table(dataset, sep=" ").set_index('ID')
+	species_id=pandas.read_table(species_id_file, sep=" ").drop_duplicates().set_index('Run')
+	species_id_tax = add_taxonomy(species_id, ranks)
+	data2 = data_ok_error.join(species_id_tax, lsuffix='_l', rsuffix='_r')
+	data2.index.names = ['ID']
+	data2 = data2.reset_index(level=['ID']).sort_values(ranks, na_position='last')	
+	data2 = add_lines(data2, ranks)
 	data2 = data2[col] 
-
-
-
 	return render_template('output.html', version=version, data=data2.to_html())
  
 ###################################################
