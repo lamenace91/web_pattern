@@ -209,19 +209,24 @@ def add_lines(data,ranks):
 			selected_col.append(cc)
 	for cc in selected_col:
 		subdata[cc]=0
-
+	print("################")
+	print(subdata)
+	print("################")
+	subdata = subdata.reindex()
 	# filling columns of numbers
-	
-	for yy,rowsub in subdata.iterrows():
+	for yy in range(subdata.shape[0]):
+		#print(subdata.iloc[yy])
 		for xx,row in data.iterrows():
 			fit = 1
+			print(row)
 			for ii in range(len(ranks)):
-				if rowsub[ranks[ii]] != "NA" and rowsub[ranks[ii]] != row[ranks[ii]]:
+				if subdata.iloc[yy].loc[ranks[ii]] != "NA" and subdata.iloc[yy].loc[ranks[ii]] != row[ranks[ii]]:
 					 fit = 0
 			if fit == 1:
 				for cc in selected_col:
-					rowsub[cc] = rowsub[cc] + row[cc]
+					subdata.iloc[yy].loc[cc] = subdata.iloc[yy].loc[cc] + row[cc]
 	print(subdata)
+	print("<<<<<<>>>>>>>")
 	exit()
 	data = data.append(subdata.drop_duplicates())
 	ranks.append('ID')
@@ -244,13 +249,14 @@ def process():
 	for ii in range(len(ranks)):
 		col.append(ranks[ii])
 	col.append('ID')
-	merge_ok_error_files(datadir,	dataset)
+	#merge_ok_error_files(datadir,	dataset)
 	data_ok_error=pandas.read_table(dataset, sep=" ").set_index('ID')
 	species_id=pandas.read_table(species_id_file, sep=" ").drop_duplicates().set_index('Run')
 	species_id_tax = add_taxonomy(species_id, ranks)
 	data2 = data_ok_error.join(species_id_tax, lsuffix='_l', rsuffix='_r')
 	data2.index.names = ['ID']
-	data2 = data2.reset_index(level=['ID']).sort_values(ranks, na_position='last')	
+	#data2 = data2.reset_index(level=['ID']).sort_values(ranks, na_position='last')	
+	data2 = data2.reset_index(level=['ID']).sort(ranks, na_position='last')	
 	data2 = add_lines(data2, ranks)
 	data2 = data2[col] 
 	return render_template('output.html', version=version, data=data2.to_html())
