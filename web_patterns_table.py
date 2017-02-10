@@ -18,6 +18,7 @@ from flask import redirect
 from flask import url_for
 import jinja2
 import re
+import json
 
 ###################################################
 # Initialization of the Flask application
@@ -32,7 +33,7 @@ dataset = "patterns.dat4"
 datadir = "../"                  # directory with .ok and .error files
 species_id_file = "species_id.dat"
 png_directory = "png/"
-ranks=['order', 'genus', 'species']
+ranks_i=['order', 'genus', 'species']
 
 ###################################################
 ## Initialization steps
@@ -75,6 +76,7 @@ def merge_ok_error_files(data_dir, outfilename):
 	
 ###################################################
 def add_taxonomy(data, ranks):
+	print("################\n")
 	tmpranks = {}
 	for ii in range(0, len(ranks)):
 		tmpranks[ranks[ii]] = []
@@ -83,6 +85,9 @@ def add_taxonomy(data, ranks):
 		for jj in range(len(ranks)):
 			tmpranks[ranks[jj]].append(tax[jj])	
 	for ii in range(len(ranks)):
+		print("## ii %s\n" %(ii))
+		print("## rk id %s \n" %(ranks[ii]))
+		print("## rk val %s\n" %(tmpranks[ranks[ii]]))
 		data[ranks[ii]] = tmpranks[ranks[ii]]
 	return(data)
 
@@ -194,72 +199,119 @@ def build_barplot(row):
 	plt.close()
 ###################################################
 def add_lines(data,ranks):
+	#data.fillna('', inplace=True)
 	# get lines with ranks
 	subdata = data[ranks[0:1]]
 	for ii in range(1,len(ranks)):
 		subdata = subdata.append(data[ranks[0:ii+1]])
-	subdata=subdata.drop_duplicates()
+	subdata=subdata.drop_duplicates().fillna("")
 
 	# add columns with numbers to ranks
+	selected_col = get_columns_with_nb_prefix(data)			
+	for cc in selected_col:
+		subdata[cc]=0
+			
+	# set ranks as index
+	subdata['ranks']=subdata[ranks].apply(add_lines_merge_ranks, axis=1)
+	subdata.set_index('ranks', inplace=True)
+
+
+	# filling columns of numbers into subdata
+	for xx,row in data.iterrows():
+		rank_keys = add_lines_get_rank_keys(row[ranks])
+		for rr in rank_keys:
+			for cc in selected_col:
+				subdata.loc[rr, cc] = subdata.loc[rr, cc] + row[cc]
+
+	# merging data and subdata
+	# sorting the rows
+	# indexing the dataframe
+	
+	data = data.append(subdata.drop_duplicates())
+	ranks.append('ID')
+	data = data.fillna('', inplace=False).sort_values(ranks, na_position='first')	
+	data = data.reset_index()
+	# add keys for tree
+	keys = []
+	father_keys = []
+	for xx,row in data.iterrows():
+		kk = ""
+		fk = ""
+		for ii in range(len(ranks)):
+			if row[ranks[ii]] != '':
+				fk = kk
+				kk = row[ranks[ii]]
+		keys.append(kk)
+		father_keys.append(fk)
+	data['tree_keys'] = keys
+	data['tree_father_keys'] = father_keys
+	return(data)
+###################################################
+def add_lines_merge_ranks(row_ranks):	
+	val = ""
+	for ii in row_ranks:
+		val = val + ii
+	return(val)
+###################################################
+def get_columns_with_nb_prefix(data):	
 	p = re.compile('nb.*')
 	col = data.columns.values.tolist()
 	selected_col =[]
 	for cc in col:
 		if p.match(cc):
 			selected_col.append(cc)
-	for cc in selected_col:
-		subdata[cc]=0
-	print("################")
-	print(subdata)
-	print("################")
-	subdata = subdata.reindex()
-	# filling columns of numbers
-	for yy in range(subdata.shape[0]):
-		#print(subdata.iloc[yy])
-		for xx,row in data.iterrows():
-			fit = 1
-			print(row)
-			for ii in range(len(ranks)):
-				if subdata.iloc[yy].loc[ranks[ii]] != "NA" and subdata.iloc[yy].loc[ranks[ii]] != row[ranks[ii]]:
-					 fit = 0
-			if fit == 1:
-				for cc in selected_col:
-					subdata.iloc[yy].loc[cc] = subdata.iloc[yy].loc[cc] + row[cc]
-	print(subdata)
-	print("<<<<<<>>>>>>>")
-	exit()
-	data = data.append(subdata.drop_duplicates())
-	ranks.append('ID')
-#	print(ranks)
-
-	
-	data = data.sort_values(ranks, na_position='first')	
-	data = data.fillna('')
-	
-	
-	
-	return(data)
-	
+	return(selected_col)
+###################################################
+def add_lines_get_rank_keys(row_ranks):	
+	val = []
+	tmp = ""
+	for ii in row_ranks.fillna(''):
+		tmp =  tmp + ii
+		val.append(tmp)
+	return(set(val))
 ###################################################
 ## the main route
 
 @app.route('/')
 def process():	
-	col = []
-	for ii in range(len(ranks)):
-		col.append(ranks[ii])
-	col.append('ID')
+	ranks = ['order', 'genus', 'species']
 	#merge_ok_error_files(datadir,	dataset)
 	data_ok_error=pandas.read_table(dataset, sep=" ").set_index('ID')
 	species_id=pandas.read_table(species_id_file, sep=" ").drop_duplicates().set_index('Run')
 	species_id_tax = add_taxonomy(species_id, ranks)
 	data2 = data_ok_error.join(species_id_tax, lsuffix='_l', rsuffix='_r')
+	print("first: %s " % (data2.index.name))
+	print (data2.columns.values.tolist())
 	data2.index.names = ['ID']
+	print("second: %s " % (data2.index.name))
+	print (data2.columns.values.tolist())
 	#data2 = data2.reset_index(level=['ID']).sort_values(ranks, na_position='last')	
-	data2 = data2.reset_index(level=['ID']).sort(ranks, na_position='last')	
+	print("third: %s " % (data2.index.name))
+	print (data2.columns.values.tolist())
+	if 'ID' in data2.columns.values.tolist():
+		data2 = data2.reset_index('ID',drop=True)
+	else:
+		data2 = data2.reset_index('ID',drop=False)
+		
+	#data2 = data2.reset_index('ID')
+	print("fourth: %s " % (data2.index.name))
+	print (data2.columns.values.tolist())
+	data2 = data2.sort(ranks, na_position='last')	
 	data2 = add_lines(data2, ranks)
-	data2 = data2[col] 
-	return render_template('output.html', version=version, data=data2.to_html())
+
+	selected_col = []
+	for ii in range(len(ranks)):
+		selected_col.append(ranks[ii])
+	selected_col.append('tree_keys')
+	selected_col.append('tree_father_keys')
+	col = get_columns_with_nb_prefix(data2)
+	col.sort()
+	for ii in range(len(col)):
+		selected_col.append(col[ii])
+	
+	data2 = data2[selected_col] 
+	#print(data2)
+	return render_template('output.html', version=version, data=data2)
  
 ###################################################
 ###################################################
