@@ -30,6 +30,7 @@ myport = 5555
 version = 0.1
 dataset = "./patterns.dat.tmp"   # replaced by datadir
 dataset = "patterns.dat4"
+#dataset = "q"
 datadir = "../"                  # directory with .ok and .error files
 species_id_file = "species_id.dat"
 png_directory = "png/"
@@ -229,7 +230,8 @@ def add_lines(data,ranks):
 	
 	data = data.append(subdata.drop_duplicates())
 	ranks.append('ID')
-	data = data.fillna('', inplace=False).sort_values(ranks, na_position='first')	
+#	data = data.fillna('', inplace=False).sort_values(ranks, na_position='first')	
+	data = data.fillna('', inplace=False).sort(ranks, na_position='first')	
 	data = data.reset_index()
 	# add keys for tree
 	keys = []
@@ -310,7 +312,8 @@ def process():
 		selected_col.append(col[ii])
 	
 	data2 = data2[selected_col] 
-	#print(data2)
+	print(data2[1:5][:])
+	data2.to_csv('/tmp/out.csv')
 	return render_template('output.html', version=version, data=data2)
  
 ###################################################
