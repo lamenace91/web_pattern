@@ -277,9 +277,9 @@ def add_lines_get_rank_keys(row_ranks):
 @app.route('/')
 def process():	
 	ranks = ['order', 'genus', 'species']
-	#merge_ok_error_files(datadir,	dataset)
-	data_ok_error=pandas.read_table(dataset, sep=" ").set_index('ID')
-	species_id=pandas.read_table(species_id_file, sep=" ").drop_duplicates().set_index('Run')
+	merge_ok_error_files(datadir,	dataset)
+	data_ok_error = pandas.read_table(dataset, sep=" ").set_index('ID')
+	species_id = pandas.read_table(species_id_file, sep=" ").drop_duplicates().set_index('Run')
 	species_id_tax = add_taxonomy(species_id, ranks)
 	data2 = data_ok_error.join(species_id_tax, lsuffix='_l', rsuffix='_r')
 	print("first: %s " % (data2.index.name))
@@ -310,7 +310,9 @@ def process():
 	col.sort()
 	for ii in range(len(col)):
 		selected_col.append(col[ii])
-	
+	f = open("data2.csv", "w")
+	data2.to_csv(f, header=True, index=False)
+        
 	data2 = data2[selected_col] 
 	print(data2[1:5][:])
 	data2.to_csv('/tmp/out.csv')
