@@ -31,12 +31,9 @@ myport = 5555
 version = 0.1
 dataset = "./patterns.dat.tmp"   # replaced by datadir
 dataset = "patterns.dat4"
-<<<<<<< HEAD
 #dataset = "q"
 datadir = "../"                  # directory with .ok and .error files
-=======
 datadir = "./data_dir/"                  # directory with .ok and .error files
->>>>>>> ab2865fd7d3897fdfcec9d1cb73e09f728bc9b6a
 species_id_file = "species_id.dat"
 png_directory = "png/"
 ranks_i=['order', 'genus', 'species']
@@ -284,13 +281,9 @@ def process():
 	t1 = time.time()
 
 	ranks = ['order', 'genus', 'species']
-<<<<<<< HEAD
 	#merge_ok_error_files(datadir,	dataset)
-=======
 	merge_ok_error_files(datadir,	dataset)
 	t2 = time.time()
-
->>>>>>> ab2865fd7d3897fdfcec9d1cb73e09f728bc9b6a
 	data_ok_error = pandas.read_table(dataset, sep=" ").set_index('ID')
 	t3 = time.time()
 
@@ -348,10 +341,8 @@ def process():
 	print(t11)
      
 	data2 = data2[selected_col] 
-<<<<<<< HEAD
 	print(data2[1:5][:])
 	data2.to_csv('/tmp/out.csv')
-=======
 	#print(data2)
 	t12 = time.time()
 	print(t12)
@@ -365,7 +356,6 @@ def process():
 	print("t8 %f" %(t9-t8))
 	print("t9 %f" %(t10-t9))
 	print("t10 %f" %(t11-t10))
->>>>>>> ab2865fd7d3897fdfcec9d1cb73e09f728bc9b6a
 	return render_template('output.html', version=version, data=data2)
  
 ###################################################

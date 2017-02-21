@@ -1,30 +1,28 @@
 <!doctype html>
 <html>
   <head>
-<<<<<<< HEAD
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 	 
+<!--
 	<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='js/jquery-treetable.css') }}">
     <link href="http://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.10/d3.min.js"></script>
-
 	<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
-
- 
-
     <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-treetable.js') }}"></script>
+-->
 
 	
+<!--
 	<script>
 			$(function() {
 			$("table").treetable();
 		});
 	</script>
+-->
 
-=======
 <!--
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/jquery-easyui-themes/ui-cupertino_perso/easyui.css') }}" />
 -->
@@ -32,23 +30,16 @@
   
  
 
-   <link rel="stylesheet" href="{{ url_for('static', filename='js/screen.css') }}" media="screen" />
   <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.1.1.min.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-treetable.2.js') }}"></script>
 
-  
+  <link rel="stylesheet" href="{{ url_for('static', filename='js/screen.css') }}" media="screen" />
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='js/jquery.treetable.theme.default.2.css') }}">
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='js/jquery.treetable.2.css') }}">
 
  
  
  
- <script>
-$("#mytable").treetable({ expandable: true });
-</script>	
- <script>
-$("#example-basic-expandable").treetable({ expandable: true });
-</script>	
 
 
 <!--
@@ -59,7 +50,6 @@ $("#example-basic-expandable").treetable({ expandable: true });
 	</script>
 -->
 	
->>>>>>> ab2865fd7d3897fdfcec9d1cb73e09f728bc9b6a
     <style>
     body { background-color:#fbfbfb;}
     </style> 
@@ -68,36 +58,74 @@ $("#example-basic-expandable").treetable({ expandable: true });
   </head>
   
   
-  
-<<<<<<< HEAD
   <body> 
+
+
+
+
+
+
+
+      <table id="example-basic" class="treetable">
+        <caption>Basic jQuery treetable Example</caption>
+        <thead>
+          <tr>
+            <th>Tree column</th>
+            <th>Additional data</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-tt-id="1" class="branch expanded">
+            <td><span class="indenter" style="padding-left: 0px;"></span>Node 1: Click on the icon in front of me to expand this branch.</td>
+            <td>I live in the second column.</td>
+          </tr>
+          <tr data-tt-id="1.1" data-tt-parent-id="1" class="branch expanded" style="display: table-row;">
+            <td><span class="indenter" style="padding-left: 19px;"></span>Node 1.1: Look, I am a table row <em>and</em> I am part of a tree!</td>
+            <td>Interesting.</td>
+          </tr>
+          <tr data-tt-id="1.1.1" data-tt-parent-id="1.1" class="leaf collapsed" style="display: table-row;">
+            <td><span class="indenter" style="padding-left: 38px;"></span>Node 1.1.1: I am part of the tree too!</td>
+            <td>That's it!</td>
+          </tr>
+          <tr data-tt-id="2" class="leaf collapsed">
+            <td><span class="indenter" style="padding-left: 0px;"></span>Node 2: I am another root node, but without children</td>
+            <td>Hurray!</td>
+          </tr>
+        </tbody>
+      </table>
+
+
+
+
+
 
 	<div class="container" style="margin:150px auto;">
 		<table class="table table-bordered  tt-table">
 			
-=======
   
   
         <h3>Basic Expandable Tree</h3>
 
+
+
       <table id="example-basic-expandable">
         <tr data-tt-id="0">
-          <td>app</td>
+          <td>app</td><td>aa</td>
         </tr>
         <tr data-tt-id="1" data-tt-parent-id="0">
-          <td>controllers</td>
+          <td>controllers</td><td>bb</td>
         </tr>
         <tr data-tt-id="5" data-tt-parent-id="1">
-          <td>application_controller.rb</td>
+          <td>application_controller.rb</td><td>cc</td>
         </tr>
         <tr data-tt-id="2" data-tt-parent-id="0">
-          <td>helpers</td>
+          <td>helpers</td><td>dd</td>
         </tr>
         <tr data-tt-id="3" data-tt-parent-id="0">
-          <td>models</td>
+          <td>models</td><td>ee</td>
         </tr>
         <tr data-tt-id="4" data-tt-parent-id="0">
-          <td>views</td>
+          <td>views</td><td>ff</td>
         </tr>
       </table>
       
@@ -108,14 +136,31 @@ $("#example-basic-expandable").treetable({ expandable: true });
 <!--
 	<table class="table table-bordered" id="mytable">
 -->
-	<table  class="treetable" id="mytable">
->>>>>>> ab2865fd7d3897fdfcec9d1cb73e09f728bc9b6a
+	<table class="table table-bordered" id="mytable">
 		<thead>
 			<tr>
-				<th   style="width:1000px">
-					taxon
-				</th>
-			
+				<th   style="width:1000px">taxonomy</th>
+				<th   style="width:200px">sequence #</th>
+				<th   style="width:100px">sequence #</th>
+				<th   style="width:100px">array #</th>
+				
+				<th   style="width:10px">AATGGGGGG</th>
+				<th   style="width:100px">TAGGG</th>
+				<th   style="width:100px">TGTGGG</th>
+				
+				<th   style="width:100px">TCAGG </th>
+				<th   style="width:100px">TTAGG </th>
+				<th   style="width:100px">TTAGGC</th>
+				<th   style="width:100px">TTAGGG </th>
+
+				<th   style="width:100px">TTGCA  </th>
+				<th   style="width:100px">TTGGGG </th>
+				<th   style="width:100px">TTTAGGG </th>
+				<th   style="width:100px">TTTGGG  </th>
+				<th   style="width:100px">TTTTAGGG </th>
+				<th   style="width:100px">TTTTGGGG  </th>
+				
+
 <!--
 				{% for ii in data.columns.values.tolist() %}
 					<th>
@@ -128,50 +173,49 @@ $("#example-basic-expandable").treetable({ expandable: true });
 		<tbody>
 		
 		{% for kk, jj in data.iterrows() %}
-			<tr class="leaf collapsed" data-tt-id="{{ jj.tree_keys }}" data-tt-parent="{{ jj.tree_father_keys }}">
-			<td>  <a title="Collapse" href="#">&nbsp;</a> {{ jj.tree_keys }}
-<!--
-				<div class="tt" data-tt-id="{{ jj.tree_keys }}" data-tt-parent="{{ jj.tree_father_keys }}">  {{ jj.tree_keys }}  </div>
-
-				<div class="leaf collapsed" data-tt-id="{{ jj.tree_keys }}" data-tt-parent="{{ jj.tree_father_keys }}">  {{ jj.tree_keys }}  </div>
--->	
+			<tr data-tt-id="{{ jj.tree_keys }}" data-tt-parent-id="{{ jj.tree_father_keys }}" class="branch expanded">
+			<td> <span class="indenter" style="padding-left: 0px;"><a href="#" title="Collapse">&nbsp;</a> {{ jj.tree_keys }}     </td>
 	
-			</td>
-				<td>
-				{{ jj.genus }}
-			</td>
-			<td>
-				{{ jj.species }}
-			</td>
-
-			<td>
-				{{ jj.nbseqE }}
-			</td>
-			<td>
-				{{ jj.nbseqO }}
-			</td>
-			<td>
-				{{ jj.nbrep }}
-			</td>
-			
-			
-			
-			
-			
-			
 <!--
-				{% for ii in jj %}
-					<td>
-					{{ ii }}
-					</td>
-				{% endfor %}  
+				<td>	{{ jj.genus }}</td>
+			    <td>	{{ jj.species }}</td>
 -->
-			</tr>	
+			    <td>    {{ jj.nbseqE }}</td>
+			    <td>    {{ jj.nbseqO }}</td>
+			    <td>    {{ jj.nbrep }}</td>		
+			    
+				<td>	{{ jj.nbAATGGGGGG }}</td>
+			    <td>	{{ jj.nbTAGGG }}</td>
+			    <td>    {{ jj.nbTGTGGG }}</td>
+
+
+				<td>	{{ jj.nbTCAGG }}</td>				
+			    <td>	{{ jj.nbTTAGG }}</td>
+			    <td>    {{ jj.nbTTAGGC }}</td>
+			    <td>    {{ jj.nbTTAGGG }}</td>	
+			    	
+				<td>	{{ jj.nbTTGCA }}</td>
+			    <td>	{{ jj.nbTTGGGG }}</td>
+			    <td>    {{ jj.nbTTTAGGG }}</td>
+			    <td>    {{ jj.nbTTTGGG }}</td>
+			    <td>    {{ jj.nbTTTTAGGG }}</td>		
+			    <td>    {{ jj.nbTTTTGGGG }}</td>		
+
+				</tr>	
 		{% endfor %}  
 	  
 		</tbody>
    </table>
-	  
+
+ <script>
+$("#example-basic-expandable").treetable({ expandable: true });
+
+$("#example-basic").treetable({ expandable: true });
+
+$("#mytable").treetable({ expandable: true });
+
+</script>	
+
 		</div>
   </body>
 </html>
