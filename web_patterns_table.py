@@ -277,7 +277,7 @@ def add_lines_get_rank_keys(row_ranks):
 @app.route('/')
 def process():	
 	ranks = ['order', 'genus', 'species']
-	merge_ok_error_files(datadir,	dataset)
+	#merge_ok_error_files(datadir,	dataset)
 	data_ok_error = pandas.read_table(dataset, sep=" ").set_index('ID')
 	species_id = pandas.read_table(species_id_file, sep=" ").drop_duplicates().set_index('Run')
 	species_id_tax = add_taxonomy(species_id, ranks)
