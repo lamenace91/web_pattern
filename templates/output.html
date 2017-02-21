@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
   <head>
+<<<<<<< HEAD
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -23,20 +24,92 @@
 		});
 	</script>
 
+=======
+<!--
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/jquery-easyui-themes/ui-cupertino_perso/easyui.css') }}" />
+-->
+
+  
+ 
+
+   <link rel="stylesheet" href="{{ url_for('static', filename='js/screen.css') }}" media="screen" />
+  <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.1.1.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-treetable.2.js') }}"></script>
+
+  
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='js/jquery.treetable.theme.default.2.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='js/jquery.treetable.2.css') }}">
+
+ 
+ 
+ 
+ <script>
+$("#mytable").treetable({ expandable: true });
+</script>	
+ <script>
+$("#example-basic-expandable").treetable({ expandable: true });
+</script>	
+
+
+<!--
+<script>
+		$(function() {
+			$("table").treetable();
+		});
+	</script>
+-->
+	
+>>>>>>> ab2865fd7d3897fdfcec9d1cb73e09f728bc9b6a
     <style>
     body { background-color:#fbfbfb;}
     </style> 
   
-  <title>pattern data (version {{version}})</title>   
+  <title>PATTERN data (version {{version}})</title>   
   </head>
   
   
   
+<<<<<<< HEAD
   <body> 
 
 	<div class="container" style="margin:150px auto;">
 		<table class="table table-bordered  tt-table">
 			
+=======
+  
+  
+        <h3>Basic Expandable Tree</h3>
+
+      <table id="example-basic-expandable">
+        <tr data-tt-id="0">
+          <td>app</td>
+        </tr>
+        <tr data-tt-id="1" data-tt-parent-id="0">
+          <td>controllers</td>
+        </tr>
+        <tr data-tt-id="5" data-tt-parent-id="1">
+          <td>application_controller.rb</td>
+        </tr>
+        <tr data-tt-id="2" data-tt-parent-id="0">
+          <td>helpers</td>
+        </tr>
+        <tr data-tt-id="3" data-tt-parent-id="0">
+          <td>models</td>
+        </tr>
+        <tr data-tt-id="4" data-tt-parent-id="0">
+          <td>views</td>
+        </tr>
+      </table>
+      
+
+	  
+	  
+	   
+<!--
+	<table class="table table-bordered" id="mytable">
+-->
+	<table  class="treetable" id="mytable">
+>>>>>>> ab2865fd7d3897fdfcec9d1cb73e09f728bc9b6a
 		<thead>
 			<tr>
 				<th   style="width:1000px">
@@ -55,9 +128,14 @@
 		<tbody>
 		
 		{% for kk, jj in data.iterrows() %}
-			<tr>
-			<td>
+			<tr class="leaf collapsed" data-tt-id="{{ jj.tree_keys }}" data-tt-parent="{{ jj.tree_father_keys }}">
+			<td>  <a title="Collapse" href="#">&nbsp;</a> {{ jj.tree_keys }}
+<!--
 				<div class="tt" data-tt-id="{{ jj.tree_keys }}" data-tt-parent="{{ jj.tree_father_keys }}">  {{ jj.tree_keys }}  </div>
+
+				<div class="leaf collapsed" data-tt-id="{{ jj.tree_keys }}" data-tt-parent="{{ jj.tree_father_keys }}">  {{ jj.tree_keys }}  </div>
+-->	
+	
 			</td>
 				<td>
 				{{ jj.genus }}

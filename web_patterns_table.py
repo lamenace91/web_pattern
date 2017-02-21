@@ -19,6 +19,7 @@ from flask import url_for
 import jinja2
 import re
 import json
+import time
 
 ###################################################
 # Initialization of the Flask application
@@ -30,8 +31,12 @@ myport = 5555
 version = 0.1
 dataset = "./patterns.dat.tmp"   # replaced by datadir
 dataset = "patterns.dat4"
+<<<<<<< HEAD
 #dataset = "q"
 datadir = "../"                  # directory with .ok and .error files
+=======
+datadir = "./data_dir/"                  # directory with .ok and .error files
+>>>>>>> ab2865fd7d3897fdfcec9d1cb73e09f728bc9b6a
 species_id_file = "species_id.dat"
 png_directory = "png/"
 ranks_i=['order', 'genus', 'species']
@@ -276,12 +281,27 @@ def add_lines_get_rank_keys(row_ranks):
 
 @app.route('/')
 def process():	
+	t1 = time.time()
+
 	ranks = ['order', 'genus', 'species']
+<<<<<<< HEAD
 	#merge_ok_error_files(datadir,	dataset)
+=======
+	merge_ok_error_files(datadir,	dataset)
+	t2 = time.time()
+
+>>>>>>> ab2865fd7d3897fdfcec9d1cb73e09f728bc9b6a
 	data_ok_error = pandas.read_table(dataset, sep=" ").set_index('ID')
+	t3 = time.time()
+
 	species_id = pandas.read_table(species_id_file, sep=" ").drop_duplicates().set_index('Run')
+	t4 = time.time()
 	species_id_tax = add_taxonomy(species_id, ranks)
+	t5 = time.time()
+	print(t5)
 	data2 = data_ok_error.join(species_id_tax, lsuffix='_l', rsuffix='_r')
+	t6 = time.time()
+	print(t6)
 	print("first: %s " % (data2.index.name))
 	print (data2.columns.values.tolist())
 	data2.index.names = ['ID']
@@ -294,28 +314,58 @@ def process():
 		data2 = data2.reset_index('ID',drop=True)
 	else:
 		data2 = data2.reset_index('ID',drop=False)
-		
+	print("t7")
+	t7 = time.time()
+	print(t7)
+	
 	#data2 = data2.reset_index('ID')
 	print("fourth: %s " % (data2.index.name))
 	print (data2.columns.values.tolist())
 	data2 = data2.sort(ranks, na_position='last')	
+	t8 = time.time()
+	print("t8")
+	print(t8)
 	data2 = add_lines(data2, ranks)
 
+	t9 = time.time()
+	print("t9")
+	print(t9)
 	selected_col = []
 	for ii in range(len(ranks)):
 		selected_col.append(ranks[ii])
 	selected_col.append('tree_keys')
 	selected_col.append('tree_father_keys')
 	col = get_columns_with_nb_prefix(data2)
+	print("t10")
+	t10 = time.time()
+	print(t10)
 	col.sort()
 	for ii in range(len(col)):
 		selected_col.append(col[ii])
 	f = open("data2.csv", "w")
 	data2.to_csv(f, header=True, index=False)
-        
+	t11 = time.time()
+	print(t11)
+     
 	data2 = data2[selected_col] 
+<<<<<<< HEAD
 	print(data2[1:5][:])
 	data2.to_csv('/tmp/out.csv')
+=======
+	#print(data2)
+	t12 = time.time()
+	print(t12)
+	print("t1 %f" %(t2-t1))
+	print("t2 %f" %(t3-t2))
+	print("t3 %f" %(t4-t3))
+	print("t4 %f" %(t5-t4))
+	print("t5 %f" %(t6-t5))
+	print("t6 %f" %(t7-t6))
+	print("t7 %f" %(t8-t7))
+	print("t8 %f" %(t9-t8))
+	print("t9 %f" %(t10-t9))
+	print("t10 %f" %(t11-t10))
+>>>>>>> ab2865fd7d3897fdfcec9d1cb73e09f728bc9b6a
 	return render_template('output.html', version=version, data=data2)
  
 ###################################################
